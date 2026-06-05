@@ -1,0 +1,84 @@
+---
+title: "Feedback"
+summary: "Learn how to use the Feedback component to display informational, success, warning, and error messages to users."
+updatedAt: "2025-03-08"
+navLabel: "Feedback"
+navIcon: "info"
+---
+
+The Feedback component provides a consistent way to communicate status messages, alerts, and notifications to users. It supports different variants to convey different types of information effectively.
+
+## Basic Usage
+
+The Feedback component has four main variants: info, success, warning, and danger.
+
+<Feedback
+  icon
+  variant="info"
+  title="Information"
+  description="This is an informational message for the user."
+/>
+
+## Variants
+
+Each variant is designed to communicate a specific type of message:
+
+<Feedback
+  icon
+  marginBottom="24"
+  variant="success"
+  title="Success"
+  description="Your changes have been saved successfully."
+/>
+
+<Feedback
+  icon
+  marginBottom="24"
+  variant="warning"
+  title="Warning"
+  description="Your session will expire in 5 minutes. Please save your work."
+/>
+
+<Feedback
+  icon
+  marginBottom="24"
+  variant="danger"
+  title="Error"
+  description="There was a problem processing your request. Please try again."
+/>
+
+## With Button
+
+You can add an action button to provide users with a direct way to respond:
+
+<Feedback
+  variant="info"
+  title="New Feature Available"
+  description="We've added a new feature that you might be interested in."
+>
+  <Button size="s">Learn More</Button>
+</Feedback>
+
+## Implementation Example
+
+Here's how to implement Feedback components in your application:
+
+```tsx
+<Feedback
+  variant="success"
+  title="Form Submitted"
+  description="Thank you for your submission. We'll be in touch soon."
+/>
+```
+
+## Best Practices
+
+When using the Feedback component:
+
+1. **Be specific**: Provide clear, concise messages that explain what happened
+2. **Suggest actions**: When appropriate, tell users what they can do next
+3. **Use appropriate variants**: Choose the right variant based on the message type
+4. **Position strategically**: Place feedback where users will notice it without disrupting their workflow
+5. **Allow dismissal**: For non-critical messages, provide a way to dismiss the feedback
+
+The Feedback component helps create a better user experience by providing timely, relevant information in a consistent format.

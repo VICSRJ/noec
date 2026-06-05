@@ -1,0 +1,61 @@
+---
+title: "Card"
+summary: "Learn how to use the Card component to create visually appealing content containers in your application."
+updatedAt: "2025-03-08"
+navLabel: "Card"
+navIcon: "card"
+---
+
+The Card component provides a flexible container for grouping related content and actions. Cards are commonly used for dashboards, product listings, and information displays.
+
+## Basic Usage
+
+Cards can contain various types of content including text, images, and interactive elements. They support different visual styles through props like `border`, `shadow`, and `radius`.
+
+<Card
+  padding="4"
+  radius="l"
+  shadow="m"
+  direction="column"
+  border="neutral-alpha-medium"
+  horizontal="start"
+>
+  <Media
+    src="/images/cover.jpg"
+    alt="Feature illustration"
+    aspectRatio="16/9"
+    radius="m"
+  />
+  <Column fillWidth paddingTop="20" paddingX="16" paddingBottom="16" gap="8" horizontal="start">
+    <Text variant="heading-strong-m" onBackground="neutral-strong">Feature Title</Text>
+    <Text variant="body-default-s" onBackground="neutral-weak">Description of this amazing feature and how it benefits users</Text>
+  </Column>
+</Card>
+
+## Implementation Example
+
+Here's how to implement a card with an image and text:
+
+```tsx
+<Card
+  padding="4"
+  radius="l"
+  shadow="m"
+  direction="column"
+  border="neutral-alpha-medium"
+  horizontal="start"
+>
+  <Media
+    src="/images/cover.jpg"
+    alt="Feature illustration"
+    aspectRatio="16/9"
+    radius="m"
+  />
+  <Column fillWidth paddingTop="20" paddingX="16" paddingBottom="16" gap="8" horizontal="start">
+    <Text variant="heading-strong-m" onBackground="neutral-strong">Feature Title</Text>
+    <Text variant="body-default-s" onBackground="neutral-weak">Description of this amazing feature and how it benefits users</Text>
+  </Column>
+</Card>
+```
+
+Cards are highly customizable and can be adapted to fit various design requirements in your application.
