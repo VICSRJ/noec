@@ -1,9 +1,10 @@
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 const baseURL = "https://vicsrj.github.io/noec/";
 
 const routes = {
-  '/changelog': true,
-  '/roadmap': true,
-}
+  "/changelog": true,
+  "/roadmap": true,
+};
 
 import { Geist } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
@@ -25,7 +26,7 @@ const style = {
   border: "playful",
   surface: "translucent",
   transition: "all",
-  scaling: "100"
+  scaling: "100",
 };
 
 const dataStyle = {
@@ -59,15 +60,15 @@ const schema = {
   logo: "",
   type: "Organization",
   name: "Magic Docs",
-  description: "Magic Docs is a simple and beautiful documentation template built with Once UI.",
+  description: "Magic Docs is a simple and beautiful documentation system built with Once UI.",
   email: "",
-  locale: "en_US"
+  locale: "en_US",
 };
 
 const meta = {
-  home: { title: `Docs – ${schema.name}`, description: schema.description, path: "/", image: "/images/cover.jpg" },
-  roadmap: { title: `Roadmap – ${schema.name}`, description: schema.description, path: "/roadmap", image: "/images/cover.jpg" },
-  changelog: { title: `Changelog – ${schema.name}`, description: schema.description, path: "/changelog", image: "/images/cover.jpg" }
+  home: { title: `Docs – ${schema.name}`, description: schema.description, path: "/", image: `${basePath}/images/cover.jpg` },
+  roadmap: { title: `Roadmap – ${schema.name}`, description: schema.description, path: "/roadmap", image: `${basePath}/images/cover.jpg` },
+  changelog: { title: `Changelog – ${schema.name}`, description: schema.description, path: "/changelog", image: `${basePath}/images/cover.jpg` },
 };
 
-export { dataStyle, effects, style, layout, baseURL, social, schema, meta, routes, fonts };
+export { dataStyle, effects, style, layout, basePath, baseURL, social, schema, meta, routes, fonts };
