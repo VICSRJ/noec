@@ -18,24 +18,16 @@ const nextConfig = {
   trailingSlash: true,
   pageExtensions: ['ts', 'tsx', 'md', 'mdx'],
   transpilePackages: ['next-mdx-remote'],
+  poweredByHeader: false,
+  reactStrictMode: true,
   sassOptions: {
     compiler: 'modern',
     silenceDeprecations: ['legacy-js-api'],
   },
   images: {
     unoptimized: true,
-    formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    localPatterns: [
-      {
-        pathname: '/**',
-      },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
+    localPatterns: [{ pathname: '/**' }],
   },
 }
 
