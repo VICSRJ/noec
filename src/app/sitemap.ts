@@ -1,16 +1,20 @@
 import { getPages } from "@/app/utils/utils";
 import { baseURL } from "@/resources";
 
-export default async function sitemap() {
-  const pages = getPages(["src", "content"]).map((post) => ({
-    url: `${baseURL}/${post.slug}`,
-    lastModified: post.metadata.updatedAt,
+export const dynamic = "force-static";
+export const revalidate = false;
+
+export default function sitemap() {
+  const docs = getPages(["src", "content"]).map((post) => ({
+    url: new URL(`/${post.slug}`, baseURL).toString(),
+    lastModified: post.metadata.updatedAt || undefined,
   }));
 
-  const routes = pages.map((route) => ({
-    url: `${baseURL}/${route}`,
-    lastModified: new Date().toISOString().split("T")[0],
-  }));
+  const siteRoutes = ["/", "/roadmap", "/changelog"]
+    .filter((route) => route === "/" || route === "/roadmap" || route === "/changelog")
+    .map((route) => ({
+      url: new URL(route, baseURL).toString(),
+    }));
 
-  return [...routes, ...pages];
+  return [...siteRoutes, ...docs];
 }
