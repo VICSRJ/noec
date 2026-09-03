@@ -1,7 +1,9 @@
 import getNavigation from "@/app/utils/getNavigation";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export async function GET() {
-  const navigation = getNavigation();
-  return NextResponse.json(navigation);
+  return NextResponse.json(getNavigation());
 }
