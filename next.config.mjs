@@ -16,17 +16,16 @@ const nextConfig = {
   },
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   transpilePackages: ["next-mdx-remote"],
-  output: 'standalone',
+  output: 'export',
   experimental: {
     serverMinification: true,
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    // Optimize package imports for react-icons
     optimizePackageImports: ['react-icons'],
   },
-  // Configure image optimization
   images: {
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -44,29 +43,16 @@ const nextConfig = {
       },
     ],
   },
-  // Reduce webpack cache size
-  webpack: (config, { dev, isServer }) => {
-    // Only enable source maps in development
+  webpack: (config, { dev }) => {
     if (!dev) {
       config.devtool = false;
-    }
-    
-    // Optimize bundle size
-    config.optimization = {
-      ...config.optimization,
-      moduleIds: 'deterministic',
-    };
-    
-    // Disable persistent caching in production to reduce size
-    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+      };
       config.cache = false;
     }
-    
     return config;
-  },
-  // Disable webpack cache in production
-  generateBuildId: async () => {
-    return `build-${Date.now()}`;
   },
 };
 
