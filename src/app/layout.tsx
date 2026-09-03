@@ -2,7 +2,7 @@ import "@once-ui-system/core/css/styles.css";
 import "@once-ui-system/core/css/tokens.css";
 import classNames from "classnames";
 import { Footer, Header, Sidebar } from "@/product";
-import { getNavigation } from "@/app/utils/getNavigation";
+import getNavigation from "@/app/utils/getNavigation";
 import { baseURL, meta } from "@/resources";
 import { Background, Column, Flex, Meta, Row } from "@once-ui-system/core";
 import { effects, fonts, layout, schema } from "../resources/once-ui.config";
