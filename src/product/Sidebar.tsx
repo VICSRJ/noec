@@ -92,7 +92,7 @@ function SidebarContent({ navigation, pathname }: { navigation: NavigationItem[]
 
 export function Sidebar({ initialNavigation, ...rest }: SidebarProps) {
   const pathname = usePathname();
-  const containerStyle = useMemo(() => ({ maxHeight: "calc(100vh - var(--static-space-80)" }), []);
+  const containerStyle = useMemo(() => ({ maxHeight: "calc(100vh - var(--static-space-80))" }), []);
 
   return <Column width={layout.sidebar.width} minWidth={layout.sidebar.width} position="sticky" top="56" fitHeight gap="2" as="nav" overflowY="auto" paddingX="8" paddingY="16" style={containerStyle} {...rest}>
     <SidebarContent navigation={initialNavigation} pathname={pathname || ""} />
