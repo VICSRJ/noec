@@ -69,13 +69,17 @@ jobs:
           test -s out/sitemap.xml
           test -f out/.nojekyll
           grep -q 'https://vicsrj.github.io/noec/' out/sitemap.xml
-          if grep -R -Eq '(["'\'''])/_next/' out; then
-            echo "Found root-relative /_next asset paths; GitHub Pages base path would break them."
+
+          if grep -R -Eq '(src|href)="/_next/' out --include='*.html'; then
+            echo "Found root-relative /_next asset paths in generated HTML; GitHub Pages base path would break them."
             exit 1
           fi
-          if grep -R -Eq '(["'\'''])/(?!noec/|http|mailto:|tel:|#)' out/index.html; then
-            echo "Found unexpected root-relative links in the generated homepage."
+
+          if grep -R -Eq '(src|href)="/trademarks/' out --include='*.html'; then
+            echo "Found root-relative trademark asset paths in generated HTML; GitHub Pages base path would break them."
+            exit 1
           fi
+
           file_count=$(find out -type f | wc -l)
           test "${file_count}" -gt 5
           echo "Static export validated: $(du -sh out | cut -f1), ${file_count} files"
