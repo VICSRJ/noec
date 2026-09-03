@@ -1,336 +1,160 @@
 import React from "react";
-import { 
-  Column, 
-  Row, 
-  Heading, 
-  Text, 
-  Button, 
+import {
+  Column,
+  Row,
+  Heading,
+  Text,
+  Button,
   Grid,
-  Media, 
-  Line, 
+  Media,
+  Line,
   StatusIndicator,
   Badge,
   Tag,
   Meta,
-  Schema
+  Schema,
 } from "@once-ui-system/core";
-import { baseURL, meta, schema, changelog, roadmap, routes } from "@/resources";
+import { basePath, baseURL, meta, schema, changelog, roadmap, routes } from "@/resources";
 import { formatDate } from "./utils/formatDate";
 import { PageList } from "@/product/PageList";
+
+const pagePath = (path: string) => `${basePath}/${path.replace(/^\//, "")}`;
+const assetPath = (src: string) => {
+  if (!src || /^https?:\/\//i.test(src) || src.startsWith("data:")) return src;
+  return src.startsWith("/") ? `${basePath}${src}` : src;
+};
 
 export async function generateMetadata() {
   return Meta.generate({
     title: meta.home.title,
     description: meta.home.description,
-    baseURL: baseURL,
+    baseURL,
     path: meta.home.path,
-    image: meta.home.image
+    image: meta.home.image,
   });
 }
 
-// Calculate roadmap progress stats
 const calculateRoadmapStats = () => {
   let totalTasks = 0;
   let inProgressTasks = 0;
   let completedTasks = 0;
-  
-  roadmap.forEach(product => {
-    product.columns.forEach(column => {
+
+  roadmap.forEach((product) => {
+    product.columns.forEach((column) => {
       totalTasks += column.tasks.length;
-      
-      if (column.title === "In Progress") {
-        inProgressTasks += column.tasks.length;
-      }
-      
-      if (column.title === "Done") {
-        completedTasks += column.tasks.length;
-      }
+      if (column.title === "In Progress") inProgressTasks += column.tasks.length;
+      if (column.title === "Done") completedTasks += column.tasks.length;
     });
   });
-  
-  const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
+
   return {
     totalTasks,
     inProgressTasks,
     completedTasks,
-    progressPercentage
+    progressPercentage: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
   };
 };
 
 const roadmapStats = calculateRoadmapStats();
-
-// Get the latest changelog entry
 const latestChangelogEntry = changelog[0];
 
 export default function Home() {
   return (
     <Column maxWidth={56} gap="xl">
-      <Schema
-        as="webPage"
-        title={meta.home.title}
-        description={meta.home.description}
-        baseURL={baseURL}
-        path={meta.home.path}
-        author={{
-          name: schema.name
-        }}
-      />
-      
-      {/* Hero Section */}
+      <Schema as="webPage" title={meta.home.title} description={meta.home.description} baseURL={baseURL} path={meta.home.path} author={{ name: schema.name }} />
+
       <Column fillWidth gap="l" paddingTop="l">
         <Row fillWidth gap="l">
           <Column maxWidth="xs" gap="12">
-            <Badge
-              background="overlay"
-              paddingLeft="4"
-              paddingRight="16"
-              paddingY="4"
-              border="neutral-alpha-medium"
-              href="/get-started"
-              vertical="center"
-              marginBottom="12"
-            >
-                <Tag data-border="rounded" marginRight="12">Docs</Tag>
-                <Text
-                  variant="label-default-s"
-                  onBackground="neutral-weak"
-                >
-                  Simple, clean docs site
-                </Text>
+            <Badge background="overlay" paddingLeft="4" paddingRight="16" paddingY="4" border="neutral-alpha-medium" href={pagePath("/get-started")} vertical="center" marginBottom="12">
+              <Tag data-border="rounded" marginRight="12">Docs</Tag>
+              <Text variant="label-default-s" onBackground="neutral-weak">Simple, clean docs site</Text>
             </Badge>
-            <Heading variant="display-strong-s">
-              Magic Docs
-            </Heading>
+            <Heading variant="display-strong-s">Magic Docs</Heading>
             <Text wrap="balance" onBackground="neutral-weak" variant="body-default-xl" marginBottom="20">
               Build amazing product documentations without writing a single line of code
             </Text>
-            <Button data-border="rounded" size="s" href="/get-started" variant="secondary" arrowIcon id="get-started">Quick start</Button>
+            <Button data-border="rounded" size="s" href={pagePath("/get-started")} variant="secondary" arrowIcon id="get-started">Quick start</Button>
           </Column>
         </Row>
       </Column>
 
       <Column fillWidth>
         <Column fillWidth>
-          <Text 
-            variant="display-default-s" 
-            onBackground="neutral-strong"
-          >
-            Products
-          </Text>
-          <Text
-            onBackground="neutral-weak"
-            marginTop="8"
-          >
-            Deploy your docs in minutes
-          </Text>
+          <Text variant="display-default-s" onBackground="neutral-strong">Products</Text>
+          <Text onBackground="neutral-weak" marginTop="8">Deploy your docs in minutes</Text>
         </Column>
-        <PageList depth={1} thumbnail={true} marginTop="24" minHeight={14}/>
-        <Heading as="h2" variant="display-default-xs" marginTop="48">
-          Components
-        </Heading>
-        <Grid fillWidth columns="2" s={{columns: "1"}} gap="8" marginTop="24">
-          <PageList path={["components"]} description={false}/>
+        <PageList depth={1} thumbnail marginTop="24" minHeight={14} />
+        <Heading as="h2" variant="display-default-xs" marginTop="48">Components</Heading>
+        <Grid fillWidth columns="2" s={{ columns: "1" }} gap="8" marginTop="24">
+          <PageList path={["components"]} description={false} />
         </Grid>
       </Column>
-      
-      {/* Latest Update Section */}
-      {routes['/changelog'] && (
-       <Column 
-          maxWidth={56}
-          background="overlay"
-          radius="l"
-          border="neutral-alpha-weak"
-        >
-        <Column paddingX="32" paddingY="24" fillWidth horizontal="between" s={{direction: "column"}} gap="4">
-          <Row fillWidth vertical="center" horizontal="between" gap="16" wrap>
-            <Heading as="h2" variant="display-default-xs">
-              Latest Update
-            </Heading>
-            <Button data-border="rounded" weight="default" variant="secondary" href="/changelog" size="s" suffixIcon="chevronRight">
-              All changes
-            </Button>
-          </Row>
-          <Text variant="label-default-s" onBackground="neutral-weak">
-            {formatDate(latestChangelogEntry.date)}
-          </Text>
-        </Column>
-        
-        <Column fillWidth>
-          {latestChangelogEntry.image && (
-            <Media
-              priority
-              sizes="(max-width: 768px) 100vw, 768px"
-              radius="l"
-              src={latestChangelogEntry.image} 
-              alt={`Illustration for ${latestChangelogEntry.title}`}
-              border="neutral-alpha-weak"
-              aspectRatio="16 / 9"
-            />
-          )}
-          <Column fillWidth gap="4" paddingX="32" paddingY="24">
-            <Heading as="h3">
-              {latestChangelogEntry.title}
-            </Heading>
 
-            {latestChangelogEntry.description && (
-              <Text variant="body-default-m" onBackground="neutral-weak">
-                {latestChangelogEntry.description}
-              </Text>
+      {routes["/changelog"] && latestChangelogEntry && (
+        <Column maxWidth={56} background="overlay" radius="l" border="neutral-alpha-weak">
+          <Column paddingX="32" paddingY="24" fillWidth horizontal="between" s={{ direction: "column" }} gap="4">
+            <Row fillWidth vertical="center" horizontal="between" gap="16" wrap>
+              <Heading as="h2" variant="display-default-xs">Latest Update</Heading>
+              <Button data-border="rounded" weight="default" variant="secondary" href={pagePath("/changelog")} size="s" suffixIcon="chevronRight">All changes</Button>
+            </Row>
+            <Text variant="label-default-s" onBackground="neutral-weak">{formatDate(latestChangelogEntry.date)}</Text>
+          </Column>
+          <Column fillWidth>
+            {latestChangelogEntry.image && (
+              <Media priority sizes="(max-width: 768px) 100vw, 768px" radius="l" src={assetPath(latestChangelogEntry.image)} alt={`Illustration for ${latestChangelogEntry.title}`} border="neutral-alpha-weak" aspectRatio="16 / 9" />
             )}
+            <Column fillWidth gap="4" paddingX="32" paddingY="24">
+              <Heading as="h3">{latestChangelogEntry.title}</Heading>
+              {latestChangelogEntry.description && <Text variant="body-default-m" onBackground="neutral-weak">{latestChangelogEntry.description}</Text>}
+            </Column>
           </Column>
         </Column>
-      </Column>
       )}
-      
-      {/* Roadmap Progress Section */}
-      <Column 
-        maxWidth={56}
-        background="overlay"
-        radius="l"
-        border="neutral-alpha-weak"
-      >
-        <Column paddingX="32" paddingY="24" fillWidth horizontal="between" s={{direction: "column"}} gap="4">
-          <Row fillWidth vertical="center" horizontal="between" gap="16" wrap>
-            <Heading as="h2" variant="display-default-xs">
-              Q2 2025 Roadmap
-            </Heading>
-            <Button data-border="rounded" weight="default" variant="secondary" href="/roadmap" size="s" suffixIcon="chevronRight">
-            View Roadmap
-          </Button>
-          </Row>
-          <Text variant="label-default-s" onBackground="neutral-weak">
-            Progress and task status
-          </Text>
-        </Column>
-        
-        <Line background="neutral-alpha-weak" />
-        
-        <Row fillWidth padding="32" gap="20" position="relative" s={{direction: "column"}}>
-          <Row fillWidth gap="12">
-            {/* Overall Progress */}
-            <Column fillWidth gap="8" paddingTop="8">
-              <Column fillWidth gap="20">
-                <Column fillWidth horizontal="center" gap="4">
-                  <Text 
-                    variant="display-strong-l" 
-                    onBackground="neutral-strong"
-                  >
-                    {roadmapStats.progressPercentage}%
-                  </Text>
-                  <Text 
-                    align="center"
-                    variant="label-default-s" 
-                    onBackground="neutral-weak"
-                    marginTop="8"
-                  >
-                    Overall progress
-                  </Text>
-                </Column>
-                
-                <Row
-                  height="8"
-                  fillWidth
-                  overflow="hidden"
-                  radius="full"
-                  background="neutral-alpha-weak"
-                  border="neutral-alpha-weak"
-                >
-                  <Row
-                    fillHeight
-                    radius="full"
-                    transition="micro-medium"
-                    solid="brand-strong"
-                    style={{ 
-                    width: `${roadmapStats.progressPercentage}%`,
-                  }} />
-                </Row>
-              </Column>
-              
-              {/* Task Status */}
-              <Grid fillWidth columns="3" s={{columns: "1"}} gap="8" marginTop="24">
-                {/* Planned Tasks */}
-                <Column 
-                  padding="l" 
-                  horizontal="center"
-                  radius="m" 
-                  border="neutral-alpha-weak" 
-                  background="overlay"
-                  gap="s"
-                >
-                  <Text 
-                    variant="display-default-m" 
-                    onBackground="neutral-strong"
-                  >
-                    {roadmapStats.totalTasks - roadmapStats.completedTasks - roadmapStats.inProgressTasks}
-                  </Text>
-                  <Row vertical="center" gap="8">
-                    <StatusIndicator color="blue" />
-                    <Text 
-                      variant="label-default-s" 
-                      onBackground="neutral-weak"
-                    >
-                      Planned
-                    </Text>
-                  </Row>
-                </Column>
-                
-                {/* In Progress Tasks */}
-                <Column 
-                  padding="l" 
-                  horizontal="center"
-                  radius="m" 
-                  border="neutral-alpha-weak" 
-                  background="overlay"
-                  gap="s"
-                >
-                  <Text 
-                    variant="display-default-m" 
-                    onBackground="neutral-strong"
-                  >
-                    {roadmapStats.inProgressTasks}
-                  </Text>
-                  <Row vertical="center" gap="8">
-                    <StatusIndicator color="yellow" />
-                    <Text 
-                      variant="label-default-s" 
-                      onBackground="neutral-weak"
-                    >
-                      In progress
-                    </Text>
+
+      {routes["/roadmap"] && (
+        <Column maxWidth={56} background="overlay" radius="l" border="neutral-alpha-weak">
+          <Column paddingX="32" paddingY="24" fillWidth horizontal="between" s={{ direction: "column" }} gap="4">
+            <Row fillWidth vertical="center" horizontal="between" gap="16" wrap>
+              <Heading as="h2" variant="display-default-xs">Roadmap</Heading>
+              <Button data-border="rounded" weight="default" variant="secondary" href={pagePath("/roadmap")} size="s" suffixIcon="chevronRight">View Roadmap</Button>
+            </Row>
+            <Text variant="label-default-s" onBackground="neutral-weak">Progress and task status</Text>
+          </Column>
+
+          <Line background="neutral-alpha-weak" />
+          <Row fillWidth padding="32" gap="20" position="relative" s={{ direction: "column" }}>
+            <Row fillWidth gap="12">
+              <Column fillWidth gap="8" paddingTop="8">
+                <Column fillWidth gap="20">
+                  <Column fillWidth horizontal="center" gap="4">
+                    <Text variant="display-strong-l" onBackground="neutral-strong">{roadmapStats.progressPercentage}%</Text>
+                    <Text align="center" variant="label-default-s" onBackground="neutral-weak" marginTop="8">Overall progress</Text>
+                  </Column>
+                  <Row height="8" fillWidth overflow="hidden" radius="full" background="neutral-alpha-weak" border="neutral-alpha-weak">
+                    <Row fillHeight radius="full" transition="micro-medium" solid="brand-strong" style={{ width: `${roadmapStats.progressPercentage}%` }} />
                   </Row>
                 </Column>
 
-                {/* Completed Tasks */}
-                <Column 
-                  padding="l" 
-                  horizontal="center"
-                  radius="m" 
-                  border="neutral-alpha-weak" 
-                  background="overlay"
-                  gap="s"
-                >
-                  <Text 
-                    variant="display-default-m" 
-                    onBackground="neutral-strong"
-                  >
-                    {roadmapStats.completedTasks}
-                  </Text>
-                  <Row vertical="center" gap="8">
-                    <StatusIndicator color="green" />
-                    <Text 
-                      variant="label-default-s" 
-                      onBackground="neutral-weak"
-                    >
-                      Completed
-                    </Text>
-                  </Row>
-                </Column>
-              </Grid>
-            </Column>
+                <Grid fillWidth columns="3" s={{ columns: "1" }} gap="8" marginTop="24">
+                  <Column padding="l" horizontal="center" radius="m" border="neutral-alpha-weak" background="overlay" gap="s">
+                    <Text variant="display-default-m" onBackground="neutral-strong">{roadmapStats.totalTasks - roadmapStats.completedTasks - roadmapStats.inProgressTasks}</Text>
+                    <Row vertical="center" gap="8"><StatusIndicator color="blue" /><Text variant="label-default-s" onBackground="neutral-weak">Planned</Text></Row>
+                  </Column>
+                  <Column padding="l" horizontal="center" radius="m" border="neutral-alpha-weak" background="overlay" gap="s">
+                    <Text variant="display-default-m" onBackground="neutral-strong">{roadmapStats.inProgressTasks}</Text>
+                    <Row vertical="center" gap="8"><StatusIndicator color="yellow" /><Text variant="label-default-s" onBackground="neutral-weak">In progress</Text></Row>
+                  </Column>
+                  <Column padding="l" horizontal="center" radius="m" border="neutral-alpha-weak" background="overlay" gap="s">
+                    <Text variant="display-default-m" onBackground="neutral-strong">{roadmapStats.completedTasks}</Text>
+                    <Row vertical="center" gap="8"><StatusIndicator color="green" /><Text variant="label-default-s" onBackground="neutral-weak">Completed</Text></Row>
+                  </Column>
+                </Grid>
+              </Column>
+            </Row>
           </Row>
-        </Row>
-      </Column>
+        </Column>
+      )}
     </Column>
   );
 }
