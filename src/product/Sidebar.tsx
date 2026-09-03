@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Schemes, Accordion, Column, Flex, Icon, Row, Tag, ToggleButton } from "@once-ui-system/core";
 import { usePathname } from "next/navigation";
 import { routes, layout } from "@/resources";
 import styles from "./Sidebar.module.scss";
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
-let globalNavigationCache: NavigationItem[] | null = null;
 
 export interface NavigationItem extends Omit<React.ComponentProps<typeof Flex>, "title" | "label" | "children"> {
   slug: string;
@@ -24,7 +23,7 @@ export interface NavigationItem extends Omit<React.ComponentProps<typeof Flex>, 
 }
 
 interface SidebarProps extends Omit<React.ComponentProps<typeof Flex>, "children"> {
-  initialNavigation?: NavigationItem[];
+  initialNavigation: NavigationItem[];
 }
 
 function normalizeSlug(slug: string) {
@@ -71,7 +70,7 @@ const NavigationItemMemo = React.memo(NavigationItemView);
 function ResourceLink({ href, icon, label, pathname }: { href: string; icon: string; label: string; pathname: string }) {
   const selected = pathname === `${BASE_PATH}${href}` || pathname === href;
   return <ToggleButton fillWidth horizontal="between" selected={selected} className={styles.navigation} href={`${BASE_PATH}${href}`}>
-    <Row gap="8" onBackground={selected ? "neutral-strong" : "neutral-weak"} textVariant={selected ? "label-strong-s" : "label-default-s"}><Icon size="xs" name={icon} />{label}</Row>
+    <Row gap="8" onBackground={selected ? "neutral-strong" : "neutral-weak"} textVariant={selected ? "label-strong-s" : "label-default-s"><Icon size="xs" name={icon} />{label}</Row>
   </ToggleButton>;
 }
 
@@ -90,25 +89,10 @@ function SidebarContent({ navigation, pathname }: { navigation: NavigationItem[]
 }
 
 export function Sidebar({ initialNavigation, ...rest }: SidebarProps) {
-  const initial = initialNavigation?.length ? initialNavigation : globalNavigationCache || [];
-  const [navigation, setNavigation] = useState<NavigationItem[]>(initial);
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (navigation.length) {
-      if (initialNavigation?.length) globalNavigationCache = initialNavigation;
-      return;
-    }
-    const controller = new AbortController();
-    fetch(`${BASE_PATH}/api/navigation`, { signal: controller.signal })
-      .then((response) => { if (!response.ok) throw new Error(`Navigation request failed: ${response.status}`); return response.json(); })
-      .then((data: NavigationItem[]) => { const value = Array.isArray(data) ? data : []; globalNavigationCache = value; setNavigation(value); })
-      .catch((error: unknown) => { if (error instanceof DOMException && error.name === "AbortError") return; console.error("Navigation fetch failed", error); });
-    return () => controller.abort();
-  }, [initialNavigation, navigation.length]);
-
   const containerStyle = useMemo(() => ({ maxHeight: "calc(100vh - var(--static-space-80))" }), []);
+
   return <Column width={layout.sidebar.width} minWidth={layout.sidebar.width} position="sticky" top="56" fitHeight gap="2" as="nav" overflowY="auto" paddingX="8" paddingY="16" style={containerStyle} {...rest}>
-    <SidebarContent navigation={navigation} pathname={pathname || ""} />
+    <SidebarContent navigation={initialNavigation} pathname={pathname || ""} />
   </Column>;
 }
