@@ -70,7 +70,9 @@ const NavigationItemMemo = React.memo(NavigationItemView);
 function ResourceLink({ href, icon, label, pathname }: { href: string; icon: string; label: string; pathname: string }) {
   const selected = pathname === `${BASE_PATH}${href}` || pathname === href;
   return <ToggleButton fillWidth horizontal="between" selected={selected} className={styles.navigation} href={`${BASE_PATH}${href}`}>
-    <Row gap="8" onBackground={selected ? "neutral-strong" : "neutral-weak"} textVariant={selected ? "label-strong-s" : "label-default-s"><Icon size="xs" name={icon} />{label}</Row>
+    <Row gap="8" onBackground={selected ? "neutral-strong" : "neutral-weak"} textVariant={selected ? "label-strong-s" : "label-default-s"}>
+      <Icon size="xs" name={icon} />{label}
+    </Row>
   </ToggleButton>;
 }
 
@@ -90,7 +92,7 @@ function SidebarContent({ navigation, pathname }: { navigation: NavigationItem[]
 
 export function Sidebar({ initialNavigation, ...rest }: SidebarProps) {
   const pathname = usePathname();
-  const containerStyle = useMemo(() => ({ maxHeight: "calc(100vh - var(--static-space-80))" }), []);
+  const containerStyle = useMemo(() => ({ maxHeight: "calc(100vh - var(--static-space-80)" }), []);
 
   return <Column width={layout.sidebar.width} minWidth={layout.sidebar.width} position="sticky" top="56" fitHeight gap="2" as="nav" overflowY="auto" paddingX="8" paddingY="16" style={containerStyle} {...rest}>
     <SidebarContent navigation={initialNavigation} pathname={pathname || ""} />
