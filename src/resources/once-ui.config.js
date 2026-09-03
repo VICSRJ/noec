@@ -1,4 +1,4 @@
-const baseURL = "https://docs.once-ui.com";
+const baseURL = "https://akcizur.github.io/noec/";
 
 const routes = {
   '/changelog':  true,
