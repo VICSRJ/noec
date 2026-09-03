@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_ENV: production
+  CI: true
 
 jobs:
   build:
@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: ""
           package-manager-cache: false
 
       - name: Show toolchain
@@ -40,11 +39,12 @@ jobs:
           npm --version
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --include=dev --no-audit --no-fund
 
       - name: Build static export
         env:
           GITHUB_PAGES: "true"
+          NODE_ENV: production
         run: npm run build
 
       - name: Validate static export
@@ -53,7 +53,6 @@ jobs:
           set -euo pipefail
           test -d out
           test -s out/index.html
-          test -f out/404.html || true
           find out -type f -size +0c | head -n 1 >/dev/null
           echo "Static export validated: $(du -sh out | cut -f1)"
 
