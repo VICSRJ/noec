@@ -8,10 +8,13 @@ import { Sidebar, NavigationItem } from "./Sidebar";
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
-export function Header() {
+interface HeaderProps {
+  initialNavigation?: NavigationItem[];
+}
+
+export function Header({ initialNavigation = [] }: HeaderProps) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [isMac, setIsMac] = useState(false);
-  const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([]);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
@@ -19,23 +22,6 @@ export function Header() {
 
   useEffect(() => {
     setIsMac(navigator.userAgent.toLowerCase().includes("mac"));
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`${BASE_PATH}/api/navigation`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Navigation request failed: ${response.status}`);
-        return response.json();
-      })
-      .then((data: NavigationItem[]) => setNavigationItems(Array.isArray(data) ? data : []))
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        console.error("Navigation fetch failed", error);
-      });
-
-    return () => controller.abort();
   }, []);
 
   const docsItems = useMemo(() => {
@@ -56,8 +42,8 @@ export function Header() {
       }];
     });
 
-    return convert(navigationItems);
-  }, [navigationItems]);
+    return convert(initialNavigation);
+  }, [initialNavigation]);
 
   const kbar = useMemo(() => [
     {
@@ -112,11 +98,11 @@ export function Header() {
             trigger={<NavIcon hide m={{ hide: false }} onClick={() => setSidebarVisible((value) => !value)} isActive={sidebarVisible} />}
           >
             <Row width={24} style={{ height: "calc(100vh - var(--static-space-64))", top: "3.25rem", left: "-1.5rem" }} background="page" position="fixed" borderTop="neutral-alpha-medium" borderRight="neutral-alpha-medium" zIndex={9}>
-              <Sidebar data-scaling="110" fillWidth width={undefined} padding="8" />
+              <Sidebar initialNavigation={initialNavigation} data-scaling="110" fillWidth width={undefined} padding="8" />
             </Row>
           </Animation>
-          <Logo dark wordmark="/trademarks/type-dark.svg" size="s" href={`${BASE_PATH}/`} />
-          <Logo light wordmark="/trademarks/type-light.svg" size="s" href={`${BASE_PATH}/`} />
+          <Logo dark wordmark={`${BASE_PATH}/trademarks/type-dark.svg`} size="s" href={`${BASE_PATH}/`} />
+          <Logo light wordmark={`${BASE_PATH}/trademarks/type-light.svg`} size="s" href={`${BASE_PATH}/`} />
         </Row>
 
         <Kbar s={{ hide: true }} items={kbar} radius="full" background="neutral-alpha-weak">
