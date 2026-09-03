@@ -53,8 +53,17 @@ jobs:
           set -euo pipefail
           test -d out
           test -s out/index.html
-          find out -type f -size +0c | head -n 1 >/dev/null
-          echo "Static export validated: $(du -sh out | cut -f1)"
+          test -s out/robots.txt
+          test -s out/sitemap.xml
+          test -f out/.nojekyll
+          grep -q 'https://vicsrj.github.io/noec/' out/sitemap.xml
+          if grep -R -q '"/_next/' out; then
+            echo "Found root-relative /_next asset paths; GitHub Pages base path would break them."
+            exit 1
+          fi
+          file_count=$(find out -type f | wc -l)
+          test "${file_count}" -gt 5
+          echo "Static export validated: $(du -sh out | cut -f1), ${file_count} files"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
