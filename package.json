@@ -1,7 +1,6 @@
 {
   "name": "@once-ui-system/docs",
   "version": "2.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "rimraf .next/cache && next build",
