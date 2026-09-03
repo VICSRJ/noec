@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 import withMDX from '@next/mdx'
 
+const isGitHubPages = process.env.GITHUB_PAGES === 'true'
+const basePath = isGitHubPages ? '/noec' : ''
+
 const withMDXConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
@@ -10,19 +13,14 @@ const withMDXConfig = withMDX({
 })
 
 const nextConfig = {
-  sassOptions: {
-    compiler: "modern",
-    silenceDeprecations: ["legacy-js-api"],
-  },
-  pageExtensions: ["ts", "tsx", "md", "mdx"],
-  transpilePackages: ["next-mdx-remote"],
   output: 'export',
-  experimental: {
-    serverMinification: true,
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
-    optimizePackageImports: ['react-icons'],
+  basePath,
+  trailingSlash: true,
+  pageExtensions: ['ts', 'tsx', 'md', 'mdx'],
+  transpilePackages: ['next-mdx-remote'],
+  sassOptions: {
+    compiler: 'modern',
+    silenceDeprecations: ['legacy-js-api'],
   },
   images: {
     unoptimized: true,
@@ -37,23 +35,8 @@ const nextConfig = {
       {
         pathname: '/**',
       },
-      {
-        pathname: '/api/og/proxy',
-        search: '?url=*',
-      },
     ],
   },
-  webpack: (config, { dev }) => {
-    if (!dev) {
-      config.devtool = false;
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-      };
-      config.cache = false;
-    }
-    return config;
-  },
-};
+}
 
-export default withMDXConfig(nextConfig);
+export default withMDXConfig(nextConfig)
