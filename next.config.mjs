@@ -20,12 +20,16 @@ const nextConfig = {
   transpilePackages: ['next-mdx-remote'],
   poweredByHeader: false,
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   sassOptions: {
     compiler: 'modern',
     silenceDeprecations: ['legacy-js-api'],
   },
   images: {
     unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [{ protocol: 'https', hostname: '**' }],
     localPatterns: [{ pathname: '/**' }],
   },
