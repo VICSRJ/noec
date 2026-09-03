@@ -69,6 +69,7 @@ jobs:
           echo "Static export validated: $(du -sh out | cut -f1), ${file_count} files"
 
       - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
           path: out
