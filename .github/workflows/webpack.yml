@@ -1,4 +1,4 @@
-name: Next.js CI
+name: Production CI
 
 on:
   push:
@@ -11,12 +11,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: nextjs-ci-${{ github.workflow }}-${{ github.ref }}
+  group: production-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build
+    name: Next.js production build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -25,9 +25,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
+          node-version-file: ".nvmrc"
           package-manager-cache: false
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Build Next.js app
+      - name: Build
         run: npm run build
