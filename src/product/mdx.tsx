@@ -1,17 +1,16 @@
 import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import React, { ReactNode } from "react";
-
-import { 
-  Heading, 
+import {
+  Heading,
   Row,
   Column,
   Table,
-  Media, 
-  SmartLink, 
+  Media,
+  SmartLink,
   Text,
-  InlineCode, 
-  Accordion, 
-  AccordionGroup ,
+  InlineCode,
+  Accordion,
+  AccordionGroup,
   CodeBlock,
   TextProps,
   HeadingLink,
@@ -25,6 +24,7 @@ import {
   ListItem,
   Line,
 } from "@once-ui-system/core";
+import { basePath } from "@/resources";
 import { PageList } from "./PageList";
 
 const onceUIComponents = {
@@ -52,12 +52,18 @@ type CustomLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   children: ReactNode;
 };
 
+const assetPath = (src: string) => {
+  if (!src || /^https?:\/\//i.test(src) || src.startsWith("data:")) return src;
+  return src.startsWith("/") ? `${basePath}${src}` : src;
+};
+
+const internalPath = (href: string) => {
+  if (!href || /^(?:https?:|mailto:|tel:|#)/i.test(href)) return href;
+  return href.startsWith("/") ? `${basePath}${href}` : href;
+};
+
 function CustomLink({ href, children, ...props }: CustomLinkProps) {
-  return (
-    <SmartLink href={href} {...props}>
-      {children}
-    </SmartLink>
-  );
+  return <SmartLink href={internalPath(href)} {...props}>{children}</SmartLink>;
 }
 
 function createImage({ alt, src, ...props }: MediaProps & { src: string }) {
@@ -75,71 +81,46 @@ function createImage({ alt, src, ...props }: MediaProps & { src: string }) {
       aspectRatio="16 / 9"
       sizes="(max-width: 960px) 100vw, 960px"
       alt={alt}
-      src={src}
+      src={assetPath(src)}
       {...props}
     />
   );
 }
 
-function slugify(str: string): string {
-  return str
+function slugify(value: string): string {
+  return value
     .toLowerCase()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/&/g, "-and-") // Replace & with 'and'
-    .replace(/[^\w\-]+/g, "") // Remove all non-word characters except for -
-    .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+    .replace(/\s+/g, "-")
+    .replace(/&/g, "-and-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
 }
 
 function createList({ children }: { children: ReactNode }) {
-  return (
-    <List>
-      {children}
-    </List>
-  );
+  return <List>{children}</List>;
 }
 
 function createListItem({ children }: { children: ReactNode }) {
-  return (
-    <ListItem
-      marginTop="4"
-      marginBottom="8"
-    >
-      {children}
-    </ListItem>
-  );
+  return <ListItem marginTop="4" marginBottom="8">{children}</ListItem>;
 }
 
 function createHeading(as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
-  // Use HeadingLinkProps to ensure type compatibility
-  const CustomHeading = ({ children, ...props }: Omit<React.ComponentProps<typeof HeadingLink>, 'as' | 'id'>) => {
-    const slug = slugify(children as string);
+  const CustomHeading = ({ children, ...props }: Omit<React.ComponentProps<typeof HeadingLink>, "as" | "id">) => {
+    const text = typeof children === "string" ? children : String(children ?? "");
     return (
-      <HeadingLink
-        marginTop="24"
-        marginBottom="12"
-        as={as}
-        id={slug}
-        {...props}
-      >
+      <HeadingLink marginTop="24" marginBottom="12" as={as} id={slugify(text)} {...props}>
         {children}
       </HeadingLink>
     );
   };
 
-  CustomHeading.displayName = `${as}`;
-
+  CustomHeading.displayName = as;
   return CustomHeading;
 }
 
 function createParagraph({ children }: TextProps) {
   return (
-    <Text
-      style={{ lineHeight: "175%" }}
-      variant="body-default-m"
-      onBackground="neutral-medium"
-      marginTop="8"
-      marginBottom="12"
-    >
+    <Text style={{ lineHeight: "175%" }} variant="body-default-m" onBackground="neutral-medium" marginTop="8" marginBottom="12">
       {children}
     </Text>
   );
@@ -149,32 +130,23 @@ function createInlineCode({ children }: { children: ReactNode }) {
   return <InlineCode>{children}</InlineCode>;
 }
 
-function createCodeBlock(props: any) {
-  // For pre tags that contain code blocks
-  if (props.children && props.children.props && props.children.props.className) {
-    const { className, children } = props.children.props;
-    
-    // Extract language from className (format: language-xxx)
-    const language = className.replace('language-', '');
+function createCodeBlock(props: React.ComponentProps<"pre">) {
+  const child = props.children as React.ReactElement<{ className?: string; children?: ReactNode }> | undefined;
+  const className = child?.props?.className;
+
+  if (child && typeof child === "object" && className?.startsWith("language-")) {
+    const language = className.slice("language-".length) || "text";
     const label = language.charAt(0).toUpperCase() + language.slice(1);
-    
     return (
       <CodeBlock
         marginTop="8"
         marginBottom="16"
-        codes={[
-          {
-            code: children,
-            language,
-            label
-          }
-        ]}
+        codes={[{ code: String(child.props.children ?? ""), language, label }]}
         copyButton
       />
     );
   }
-  
-  // Fallback for other pre tags or empty code blocks
+
   return <pre {...props} />;
 }
 
@@ -207,31 +179,11 @@ type CustomMDXProps = MDXRemoteProps & {
 };
 
 export function CustomMDX(props: CustomMDXProps) {
-  // Add a try-catch block to handle any errors during MDX rendering
-  try {
-    return (
-      <MDXRemote
-        {...props}
-        options={{ blockJS: false }}
-        components={{
-          ...components,
-          ...(props.components || {})
-        }}
-      />
-    );
-  } catch (error) {
-    console.error('Error rendering MDX content:', error);
-    
-    // Return a fallback UI when an error occurs
-    return (
-      <Column gap="16" padding="24" border="accent-medium" radius="m">
-        <Text variant="heading-strong-m" onBackground="accent-strong">
-          Error rendering content
-        </Text>
-        <Text variant="body-default-m" onBackground="accent-medium">
-          There was an error rendering this content. Please try refreshing the page.
-        </Text>
-      </Column>
-    );
-  }
+  return (
+    <MDXRemote
+      {...props}
+      options={{ blockJS: false }}
+      components={{ ...components, ...(props.components || {}) }}
+    />
+  );
 }
