@@ -35,13 +35,15 @@ const uniqueRoutes = [...new Set(routes)].sort((a, b) => {
   return a.localeCompare(b);
 });
 
+function toAbsoluteUrl(route) {
+  const normalizedRoute = route === "/" ? "/" : `${route.replace(/\/$/, "")}/`;
+  return `${baseUrl}${normalizedRoute}`;
+}
+
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...uniqueRoutes.map((route) => {
-    const loc = new URL(`${route.replace(/\/$/, "") || "/"}`, `${baseUrl}/`).toString();
-    return `  <url><loc>${loc}</loc></url>`;
-  }),
+  ...uniqueRoutes.map((route) => `  <url><loc>${toAbsoluteUrl(route)}</loc></url>`),
   "</urlset>",
   "",
 ].join("\n");
