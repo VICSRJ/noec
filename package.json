@@ -1,22 +1,21 @@
 {
   "name": "@once-ui-system/docs",
   "version": "2.1.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "rimraf .next/cache && next build",
     "start": "next start",
-    "lint": "next lint",
-    "export": "next export"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
-    "@next/mdx": "^16.0.10",
-    "@once-ui-system/core": "latest",
+    "@next/mdx": "16.3.4",
+    "@once-ui-system/core": "1.8.4",
     "classnames": "^2.5.1",
-    "eslint": "^9.21.0",
-    "eslint-config-next": "15.3.1",
     "gray-matter": "^4.0.3",
-    "next": "16.0.10",
+    "next": "16.3.4",
     "next-mdx-remote": "^6.0.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -28,11 +27,16 @@
     "@types/node": "^20",
     "@types/react": "19.2.3",
     "@types/react-dom": "19.2.3",
+    "eslint": "^9.21.0",
+    "eslint-config-next": "16.3.4",
     "rimraf": "^6.0.1",
     "typescript": "^5"
   },
   "overrides": {
     "@types/react": "19.2.3",
     "@types/react-dom": "19.2.3"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
