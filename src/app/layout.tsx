@@ -1,29 +1,26 @@
-import '@once-ui-system/core/css/styles.css';
-import '@once-ui-system/core/css/tokens.css';
-
+import "@once-ui-system/core/css/styles.css";
+import "@once-ui-system/core/css/tokens.css";
 import classNames from "classnames";
-
 import { Footer, Header, Sidebar } from "@/product";
-import { baseURL } from "@/resources";
-
+import { getNavigation } from "@/app/utils/getNavigation";
+import { baseURL, meta } from "@/resources";
 import { Background, Column, Flex, Meta, Row } from "@once-ui-system/core";
 import { effects, fonts, layout, schema } from "../resources/once-ui.config";
-import { meta } from "@/resources";
 import { RouteGuard } from "@/product/RouteGuard";
-import { Providers } from '@/product/Providers';
+import { Providers } from "@/product/Providers";
 
 export async function generateMetadata() {
   const baseMetadata = Meta.generate({
     title: meta.home.title,
     description: meta.home.description,
-    baseURL: baseURL,
+    baseURL,
     path: meta.home.path,
-    image: meta.home.image
+    image: meta.home.image,
   });
 
   return {
     ...baseMetadata,
-    metadataBase: new URL(`${baseURL}`),
+    metadataBase: new URL(baseURL),
     openGraph: {
       ...baseMetadata.openGraph,
       siteName: meta.home.title,
@@ -48,29 +45,28 @@ interface RootLayoutProps {
 }
 
 export default async function RootLayout({ children }: RootLayoutProps) {
+  const navigation = getNavigation();
+
   return (
-    <>
-      <Flex
-        as="html"
-        lang="en"
-        suppressHydrationWarning
-        className={classNames(
-          fonts.heading.variable,
-          fonts.body.variable,
-          fonts.label.variable,
-          fonts.code.variable,
-        )}
-      >
-        <head>
-          <script
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: <It's not dynamic nor a security issue.>
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function() {
+    <Flex
+      as="html"
+      lang="en"
+      suppressHydrationWarning
+      className={classNames(
+        fonts.heading.variable,
+        fonts.body.variable,
+        fonts.label.variable,
+        fonts.code.variable,
+      )}
+    >
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
                 try {
                   const root = document.documentElement;
-                  
-                  const defaultTheme = 'system';
                   root.setAttribute('data-neutral', 'gray');
                   root.setAttribute('data-brand', 'blue');
                   root.setAttribute('data-accent', 'indigo');
@@ -81,41 +77,31 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                   root.setAttribute('data-transition', 'all');
                   root.setAttribute('data-scaling', '100');
                   root.setAttribute('data-viz-style', 'categorical');
-                  
-                  const resolveTheme = (themeValue) => {
-                    if (!themeValue || themeValue === 'system') {
-                      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                    }
-                    return themeValue;
-                  };
-                  
+
                   const theme = localStorage.getItem('data-theme');
-                  const resolvedTheme = resolveTheme(theme);
-                  root.setAttribute('data-theme', resolvedTheme);
-                  
+                  root.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
+
                   const styleKeys = ['neutral', 'brand', 'accent', 'solid', 'solid-style', 'viz-style', 'border', 'surface', 'transition', 'scaling'];
                   styleKeys.forEach(key => {
                     const value = localStorage.getItem('data-' + key);
-                    if (value) {
-                      root.setAttribute('data-' + key, value);
-                    }
+                    if (value) root.setAttribute('data-' + key, value);
                   });
-                } catch (e) {
+                } catch (error) {
                   document.documentElement.setAttribute('data-theme', 'dark');
                 }
               })();
-              `,
-            }}
-          />
-        </head>
-        <Providers>
+            `,
+          }}
+        />
+      </head>
+      <Providers>
         <Column background="page" as="body" fillWidth margin="0" padding="0" style={{ minHeight: "100vh" }}>
-        <Background
-          position="fixed"
-          mask={{
-            cursor: effects.mask.cursor,
-            x: effects.mask.x,
-            y: effects.mask.y,
+          <Background
+            position="fixed"
+            mask={{
+              cursor: effects.mask.cursor,
+              x: effects.mask.x,
+              y: effects.mask.y,
               radius: effects.mask.radius,
             }}
             gradient={{
@@ -128,17 +114,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               colorStart: effects.gradient.colorStart,
               colorEnd: effects.gradient.colorEnd,
               opacity: effects.gradient.opacity as
-                | 0
-                | 10
-                | 20
-                | 30
-                | 40
-                | 50
-                | 60
-                | 70
-                | 80
-                | 90
-                | 100,
+                | 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100,
             }}
             dots={{
               display: effects.dots.display,
@@ -158,27 +134,26 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               opacity: effects.lines.opacity as any,
             }}
           />
-          <Header />
-          <Flex
-            fillWidth
-            horizontal="center"
-            flex={1}
-          >
+
+          <Header initialNavigation={navigation} />
+          <Flex fillWidth horizontal="center" flex={1}>
             <Flex horizontal="center" maxWidth={layout.body.width} minHeight="0">
               <RouteGuard>
                 <Row fillWidth gap="24">
-                  <Sidebar style={{minHeight: '100vh'}} m={{hide: true}} borderRight="neutral-alpha-medium" />
-                  <Row fillWidth horizontal="center">
-                    {children}
-                  </Row>
+                  <Sidebar
+                    initialNavigation={navigation}
+                    style={{ minHeight: "100vh" }}
+                    m={{ hide: true }}
+                    borderRight="neutral-alpha-medium"
+                  />
+                  <Row fillWidth horizontal="center">{children}</Row>
                 </Row>
               </RouteGuard>
             </Flex>
           </Flex>
           <Footer />
         </Column>
-        </Providers>
-      </Flex>
-    </>
+      </Providers>
+    </Flex>
   );
 }
