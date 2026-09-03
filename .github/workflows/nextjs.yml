@@ -9,11 +9,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: github-pages-${{ github.ref }}
+  group: pages-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -21,7 +19,7 @@ env:
 
 jobs:
   build:
-    name: Build static site
+    name: Build & validate
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -33,39 +31,51 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
+          cache: ""
           package-manager-cache: false
+
+      - name: Show toolchain
+        run: |
+          node --version
+          npm --version
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build Next.js static export
+      - name: Build static export
+        env:
+          GITHUB_PAGES: "true"
         run: npm run build
 
-      - name: Validate export
+      - name: Validate static export
         shell: bash
         run: |
           set -euo pipefail
           test -d out
-          test -f out/index.html
           test -s out/index.html
-          echo "Static export OK: $(du -sh out | cut -f1)"
+          test -f out/404.html || true
+          find out -type f -size +0c | head -n 1 >/dev/null
+          echo "Static export validated: $(du -sh out | cut -f1)"
 
-      - name: Upload GitHub Pages artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./out
+          path: out
 
   deploy:
-    name: Deploy to GitHub Pages
+    name: Deploy
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
